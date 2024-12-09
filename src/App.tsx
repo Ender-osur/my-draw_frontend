@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { BrowserRouter as Router } from "react-router-dom";
+import { Provider } from "react-redux";
+import { Auth0Provider } from "@auth0/auth0-react";
+import { Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { store } from "./store/store";
+import { RootState } from "./store/store";
+
+import { Header } from "./components/Header";
+import AppRoutes from "./routes";
+
+const AppContent = () => {
+  const isDark = useSelector((state: RootState) => state.theme.isDark);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div
+        className={`min-h-screen ${
+          isDark ? "dark bg-gray-900" : "bg-gray-100"
+        }`}
+      >
+        <Header />
+        <AppRoutes />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+      <Toaster position="top-right" />
+    </Router>
+  );
+};
 
-export default App
+const App = () => {
+  return (
+    <Auth0Provider
+      domain="YOUR_AUTH0_DOMAIN"
+      clientId="YOUR_AUTH0_CLIENT_ID"
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+      }}
+    >
+      <Provider store={store}>
+        <AppContent />
+      </Provider>
+    </Auth0Provider>
+  );
+};
+
+export default App;
